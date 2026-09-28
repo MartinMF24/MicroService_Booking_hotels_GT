@@ -15,13 +15,18 @@
 	<description>Microservicio ETL de Hoteles Booking para Grand Prix Tracker</description>
 
 	<properties>
-		<java.version>25</java.version>
-		<maven.compiler.source>25</maven.compiler.source>
-		<maven.compiler.target>25</maven.compiler.target>
-		<maven.compiler.release></maven.compiler.release>
+		<java.version>24</java.version>
+		<maven.compiler.source>24</maven.compiler.source>
+		<maven.compiler.target>24</maven.compiler.target>
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
@@ -51,8 +56,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>25</source>
-					<target>25</target>
+					<source>24</source>
+					<target>24</target>
 					<parameters>true</parameters>
 				</configuration>
 			</plugin>
