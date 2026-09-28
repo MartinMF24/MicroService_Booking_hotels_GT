@@ -53,8 +53,9 @@ src/main/java/com/uade/microservices/booking/BookingHotelsMicroserviceApplicatio
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `POST` | `/api/microservicios/sync-booking/{target}` | Ejecuta la sincronización manual para el target (ej: `SAO_PAULO`, `MADRID`, `BAKU`) |
-| `GET` | `/api/microservicios/sync-booking/targets` | Lista los 9 destinos de Gran Premio con fechas de carrera, check-in (-2 días) y check-out (+1 día) |
+| `POST` | `/api/microservicios/sync-booking/all` | **Sincronización masiva**: Carga y sincroniza los 9 destinos de F1 simultáneamente en sus fechas de fin de semana |
+| `POST` | `/api/microservicios/sync-booking/{target}` | Sincronización manual para un destino individual (ej: `SAO_PAULO`, `MADRID`, `BAKU`) |
+| `GET` | `/api/microservicios/sync-booking/targets` | Lista los 9 destinos de Gran Premio con fechas de carrera, check-in (-1 día) y check-out (+3 días) |
 
 > 📖 Ver guía técnica completa y documentación en [BOOKING_ETL.md](BOOKING_ETL.md).
 

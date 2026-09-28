@@ -2,6 +2,7 @@ package com.uade.microservices.booking.service;
 
 import com.uade.microservices.booking.adapter.BookingAdapter;
 import com.uade.microservices.booking.dto.rapidapi.BookingHotelRawDto;
+import com.uade.microservices.booking.dto.response.BookingSyncAllSummaryDto;
 import com.uade.microservices.booking.dto.response.BookingSyncResultDto;
 import com.uade.microservices.booking.model.Ciudad;
 import com.uade.microservices.booking.model.GranPremioTarget;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,7 +73,7 @@ class BookingSyncServiceTest {
         hab.setStockDisponible(10);
         transformedHotel.addHabitacion(hab);
 
-        when(ciudadRepository.findFirstByNombreIgnoreCase(target.getNombreCiudad()))
+        lenient().when(ciudadRepository.findFirstByNombreIgnoreCase(target.getNombreCiudad()))
                 .thenReturn(Optional.of(new Ciudad(target.getCiudadId(), target.getNombreCiudad())));
     }
 
@@ -141,6 +143,34 @@ class BookingSyncServiceTest {
         assertEquals(4, existingHotel.getEstrellas());
         assertEquals(BigDecimal.valueOf(150.00), existingHab.getPrecioPorNocheUsd());
         assertEquals(10, existingHab.getStockDisponible());
+    }
+
+    @Test
+    @DisplayName("MASIVO: Debe procesar los 9 destinos de F1 consolidando resultados")
+    void shouldSyncAllTargetsConsolidatedSummary() {
+        when(ciudadRepository.findFirstByNombreIgnoreCase(any()))
+                .thenReturn(Optional.of(new Ciudad(UUID.randomUUID(), "Ciudad Test")));
+        when(bookingClientService.extractHotels(any(GranPremioTarget.class), any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(rawDto));
+        when(bookingAdapter.toEntityList(any(), any(GranPremioTarget.class), any(UUID.class)))
+                .thenReturn(List.of(transformedHotel));
+        when(hotelRepository.findWithHabitacionesByNombreIgnoreCaseAndIdCiudad(any(), any()))
+                .thenReturn(Optional.empty());
+        when(hotelRepository.save(any(Hotel.class)))
+                .thenAnswer(inv -> {
+                    Hotel h = inv.getArgument(0);
+                    h.setIdHotel(UUID.randomUUID());
+                    return h;
+                });
+
+        BookingSyncAllSummaryDto summary = bookingSyncService.syncAllBookingData();
+
+        assertNotNull(summary);
+        assertEquals(9, summary.totalDestinosProcesados());
+        assertEquals(9, summary.destinosExitosos());
+        assertEquals(0, summary.destinosConError());
+        assertEquals(9, summary.totalHotelesCreados());
+        assertEquals(9, summary.resultados().size());
     }
 }
 

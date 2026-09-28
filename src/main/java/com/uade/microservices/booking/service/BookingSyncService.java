@@ -2,6 +2,7 @@ package com.uade.microservices.booking.service;
 
 import com.uade.microservices.booking.adapter.BookingAdapter;
 import com.uade.microservices.booking.dto.rapidapi.BookingHotelRawDto;
+import com.uade.microservices.booking.dto.response.BookingSyncAllSummaryDto;
 import com.uade.microservices.booking.dto.response.BookingSyncResultDto;
 import com.uade.microservices.booking.dto.response.HabitacionSyncSummaryDto;
 import com.uade.microservices.booking.dto.response.HotelSyncSummaryDto;
@@ -47,6 +48,78 @@ public class BookingSyncService {
         this.bookingAdapter = bookingAdapter;
         this.hotelRepository = hotelRepository;
         this.ciudadRepository = ciudadRepository;
+    }
+
+    /**
+     * Ejecuta el proceso ETL para todos los destinos de Gran Premio disponibles en el catálogo 2026.
+     * Sincroniza cada ciudad con sus fechas correspondientes (-1 día check-in, +3 días check-out)
+     * e integra un manejo de excepciones individual para que un fallo no cancele a las demás ciudades.
+     *
+     * @return Resumen consolidado del proceso para todas las ciudades.
+     */
+    public BookingSyncAllSummaryDto syncAllBookingData() {
+        log.info("Iniciando sincronización masiva de Booking para todos los destinos de Gran Premio...");
+
+        List<BookingSyncResultDto> resultados = new ArrayList<>();
+        int totalHotelesSincronizados = 0;
+        int totalHotelesCreados = 0;
+        int totalHotelesActualizados = 0;
+        int totalHabitacionesCreadas = 0;
+        int totalHabitacionesActualizadas = 0;
+        int destinosExitosos = 0;
+        int destinosConError = 0;
+
+        for (GranPremioTarget target : GranPremioTarget.values()) {
+            try {
+                log.info("Sincronizando destino masivo: {} ({})", target.name(), target.getNombreCiudad());
+                BookingSyncResultDto res = syncBookingData(target);
+                resultados.add(res);
+
+                totalHotelesSincronizados += res.totalHotelesExtraidos();
+                totalHotelesCreados += res.hotelesCreados();
+                totalHotelesActualizados += res.hotelesActualizados();
+                totalHabitacionesCreadas += res.habitacionesCreadas();
+                totalHabitacionesActualizadas += res.habitacionesActualizadas();
+
+                if ("SUCCESS".equalsIgnoreCase(res.estado())) {
+                    destinosExitosos++;
+                } else {
+                    destinosConError++;
+                }
+            } catch (Exception ex) {
+                destinosConError++;
+                log.error("Error al sincronizar el destino {}: {}", target.name(), ex.getMessage(), ex);
+                resultados.add(new BookingSyncResultDto(
+                        target,
+                        target.getNombreCiudad(),
+                        target.getFechaCarrera(),
+                        target.getCheckinDate(),
+                        target.getCheckoutDate(),
+                        target.getDestId(),
+                        0, 0, 0, 0, 0,
+                        "ERROR",
+                        "Error al sincronizar: " + ex.getMessage(),
+                        OffsetDateTime.now(),
+                        List.of()
+                ));
+            }
+        }
+
+        log.info("Sincronización masiva finalizada. Destinos procesados: {}, Exitosos: {}, Con error: {}, Hoteles creados: {}, Hoteles actualizados: {}",
+                GranPremioTarget.values().length, destinosExitosos, destinosConError, totalHotelesCreados, totalHotelesActualizados);
+
+        return new BookingSyncAllSummaryDto(
+                GranPremioTarget.values().length,
+                destinosExitosos,
+                destinosConError,
+                totalHotelesSincronizados,
+                totalHotelesCreados,
+                totalHotelesActualizados,
+                totalHabitacionesCreadas,
+                totalHabitacionesActualizadas,
+                OffsetDateTime.now(),
+                resultados
+        );
     }
 
     /**

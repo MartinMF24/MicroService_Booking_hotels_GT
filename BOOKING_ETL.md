@@ -108,7 +108,16 @@ rapidapi.booking.endpoint=${RAPIDAPI_BOOKING_ENDPOINT:/api/v1/hotels/searchHotel
 
 ## 5. Endpoints REST
 
-### 1. Sincronización Manual del Destino
+### 1. Sincronización Masiva de Todos los Destinos (Recomendado)
+- **Método**: `POST`
+- **URL**: `http://localhost:8081/api/microservicios/sync-booking/all` *(o `/sync-all`)*
+- **Descripción**: Ejecuta el pipeline ETL para los 9 Grandes Premios de 2026 de forma secuencial y resiliente, calculando las fechas de fin de semana (check-in -1 día, check-out +3 días) y resolviendo el `id_ciudad` en la base de datos Supabase.
+- **Ejemplo**:
+```bash
+curl -X POST http://localhost:8081/api/microservicios/sync-booking/all
+```
+
+### 2. Sincronización Manual de un Destino Específico
 - **Método**: `POST`
 - **URL**: `http://localhost:8081/api/microservicios/sync-booking/{target}`
 - **Ejemplo**:
@@ -116,7 +125,7 @@ rapidapi.booking.endpoint=${RAPIDAPI_BOOKING_ENDPOINT:/api/v1/hotels/searchHotel
 curl -X POST http://localhost:8081/api/microservicios/sync-booking/SAO_PAULO
 ```
 
-### 2. Catálogo de Destinos
+### 3. Catálogo Informativo de Destinos
 - **Método**: `GET`
 - **URL**: `http://localhost:8081/api/microservicios/sync-booking/targets`
 - **Ejemplo**:

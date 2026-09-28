@@ -1,5 +1,6 @@
 package com.uade.microservices.booking.controller;
 
+import com.uade.microservices.booking.dto.response.BookingSyncAllSummaryDto;
 import com.uade.microservices.booking.dto.response.BookingSyncResultDto;
 import com.uade.microservices.booking.model.GranPremioTarget;
 import com.uade.microservices.booking.service.BookingSyncService;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controlador REST para la ejecución manual del módulo ETL de Booking.
- * Provee el endpoint POST /api/microservicios/sync-booking/{target}
+ * Provee endpoints individuales por destino (POST /{target}) y masivos (POST /all).
  */
 @RestController
 @RequestMapping("/api/microservicios/sync-booking")
@@ -35,6 +36,24 @@ public class BookingSyncController {
     }
 
     /**
+     * Endpoint para ejecutar la sincronización ETL masiva de hoteles de Booking
+     * para TODOS los 9 destinos de Gran Premio de Fórmula 1 para 2026.
+     * Carga cada ciudad en sus fechas correspondientes (-1 día check-in, +3 días check-out).
+     *
+     * @return ApiResponse con el consolidado general y la lista detallada por destino.
+     */
+    @PostMapping({"/all", "/sync-all", ""})
+    public ResponseEntity<ApiResponse<BookingSyncAllSummaryDto>> syncAllBookingData() {
+        log.info("Petición recibida para sincronización masiva de TODOS los destinos de Booking");
+        BookingSyncAllSummaryDto summary = bookingSyncService.syncAllBookingData();
+        return ResponseEntity.ok(ApiResponse.success(
+                String.format("Sincronización masiva completada: %d destinos exitosos de %d procesados",
+                        summary.destinosExitosos(), summary.totalDestinosProcesados()),
+                summary
+        ));
+    }
+
+    /**
      * Endpoint para ejecutar manualmente la sincronización ETL de hoteles de Booking
      * para un Gran Premio específico.
      *
@@ -42,8 +61,12 @@ public class BookingSyncController {
      * @return ApiResponse con los detalles de hoteles y habitaciones sincronizados.
      */
     @PostMapping("/{target}")
-    public ResponseEntity<ApiResponse<BookingSyncResultDto>> syncBookingData(@PathVariable("target") String target) {
+    public ResponseEntity<?> syncBookingData(@PathVariable("target") String target) {
         log.info("Petición recibida para sincronización manual de Booking: target={}", target);
+
+        if ("all".equalsIgnoreCase(target) || "sync-all".equalsIgnoreCase(target)) {
+            return syncAllBookingData();
+        }
 
         Optional<GranPremioTarget> targetOpt = GranPremioTarget.fromString(target);
         if (targetOpt.isEmpty()) {

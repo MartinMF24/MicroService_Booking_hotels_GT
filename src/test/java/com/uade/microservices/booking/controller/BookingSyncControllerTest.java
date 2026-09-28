@@ -1,5 +1,6 @@
 package com.uade.microservices.booking.controller;
 
+import com.uade.microservices.booking.dto.response.BookingSyncAllSummaryDto;
 import com.uade.microservices.booking.dto.response.BookingSyncResultDto;
 import com.uade.microservices.booking.dto.response.HabitacionSyncSummaryDto;
 import com.uade.microservices.booking.dto.response.HotelSyncSummaryDto;
@@ -133,6 +134,26 @@ class BookingSyncControllerTest {
                 .andExpect(jsonPath("$.data[0].target").value("MADRID"))
                 .andExpect(jsonPath("$.data[0].checkinDate").value("2026-09-10"))
                 .andExpect(jsonPath("$.data[0].checkoutDate").value("2026-09-14"));
+    }
+
+    @Test
+    @DisplayName("POST /api/microservicios/sync-booking/all debe sincronizar todos los destinos y retornar consolidado")
+    void testSyncAllBookingData() throws Exception {
+        BookingSyncAllSummaryDto mockSummary = new BookingSyncAllSummaryDto(
+                9, 9, 0, 27, 20, 7, 50, 10, OffsetDateTime.now(), List.of()
+        );
+
+        when(bookingSyncService.syncAllBookingData()).thenReturn(mockSummary);
+
+        mockMvc.perform(post("/api/microservicios/sync-booking/all")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.totalDestinosProcesados").value(9))
+                .andExpect(jsonPath("$.data.destinosExitosos").value(9))
+                .andExpect(jsonPath("$.data.totalHotelesCreados").value(20));
+
+        verify(bookingSyncService, times(1)).syncAllBookingData();
     }
 }
 
