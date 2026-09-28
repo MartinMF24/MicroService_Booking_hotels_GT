@@ -135,10 +135,54 @@ curl -X GET http://localhost:8081/api/microservicios/sync-booking/targets
 
 ---
 
-## 6. Pruebas Automatizadas
+## 6. Verificación de Fallas y Resiliencia (Fault Tolerance)
 
-Para compilar y correr las pruebas del microservicio:
+El microservicio implementa una arquitectura desacoplada de manejo de fallas dividida en dos niveles: resiliencia en la extracción externa (**RapidAPI Booking**) y gestión uniforme de excepciones en la persistencia (**PostgreSQL / Supabase**).
+
+---
+
+### A. Fallas en la Conexión a la API Externa de Booking (RapidAPI)
+
+| Escenario de Falla | Causa Raíz | Comportamiento del Servicio | Respuesta HTTP al Cliente |
+|---|---|---|:---:|
+| **API Key no configurada o vacía** | Variable `RAPIDAPI_KEY` ausente o con valor `"dummy"` / `"your_rapidapi_key"`. | Detecta credenciales faltantes antes de disparar la petición HTTP y activa el generador representativo. | `200 OK` (`success: true`) |
+| **Cuota agotada (HTTP 429)** | Límite mensual o de ráfaga de RapidAPI excedido en el plan Basic/Free. | Captura `HttpStatusCodeException`, registra `WARN` en logs y conmuta al fallback representativo. | `200 OK` (`success: true`) |
+| **Credenciales inválidas (HTTP 401 / 403)** | API Key mal copiada, expirada o cuenta suspendida. | Captura `HttpStatusCodeException` y activa el fallback de datos del circuito. | `200 OK` (`success: true`) |
+| **Timeout de Conexión o Lectura** | Latencia de red (>10s al conectar o >15s al transferir datos según `BookingRestTemplateConfig`). | Captura `ResourceAccessException` y deriva al fallback sin trabar el hilo de ejecución. | `200 OK` (`success: true`) |
+| **Respuesta vacía o JSON inesperado** | Booking devuelve `{ "result": [] }` o cambia su estructura de respuesta. | `BookingClientService` valida nodos JSON y ante ausencia de resultados activa la simulación. | `200 OK` (`success: true`) |
+
+> **¿Qué y cómo responde?**: En cualquiera de estas fallas con la API externa, **el microservicio NO se interrumpe ni arroja error 500 al cliente**. Genera hoteles y habitaciones representativas reales de la ciudad sede (ej: *Palácio Tangará* en São Paulo, *Gran Meliá* en Madrid) y ejecuta el proceso de guardado y Upsert en base de datos normalmente.
+
+---
+
+### B. Fallas en la Conexión o Persistencia en Supabase (PostgreSQL)
+
+Las fallas contra la base de datos son gestionadas de forma centralizada por [`GlobalExceptionHandler`](src/main/java/com/uade/microservices/booking/shared/exception/GlobalExceptionHandler.java) (`@RestControllerAdvice`):
+
+| Escenario de Falla | Causa Raíz | Excepción Java | Respuesta HTTP y Formato |
+|---|---|---|---|
+| **Fallo de Conexión / Timeout de Pooler** | • Red universitaria/corporativa bloqueando puertos `6543`/`5432`.<br>• Proyecto de Supabase pausado.<br>• Contraseña o URL errónea en `application.properties`. | `CannotCreateTransactionException` | **`503 Service Unavailable`**<br>`{ "success": false, "message": "Error de conexión con la base de datos (Supabase): no se pudo abrir la transacción...", "data": null }` |
+| **Violación de Check Constraint** | Tipo de habitación no admitido por `habitaciones_hotel_tipo_check` (debe ser `'Single'`, `'Doble'`, o `'Suite'`), o estrellas fuera de rango 1-5. | `DataIntegrityViolationException` | **`409 Conflict`**<br>`{ "success": false, "message": "Error de restricción en base de datos: ...", "data": null }` |
+| **Violación de Foreign Key (FK)** | `id_ciudad` o `id_hotel` no existe en la tabla padre referenciada. | `DataIntegrityViolationException` | **`409 Conflict`**<br>`{ "success": false, "message": "Error de restricción en base de datos: ...", "data": null }` |
+| **Ciudad no Encontrada en Catálogo** | La ciudad del Gran Premio no está cargada en la tabla `ciudades`. | `IllegalStateException` | **`422 Unprocessable Entity`**<br>`{ "success": false, "message": "No se encontró la ciudad '...' en la tabla 'ciudades'...", "data": null }` |
+
+---
+
+### C. Aislamiento de Fallas en Sincronización Masiva (`POST /all`)
+
+En la sincronización masiva de todos los Grandes Premios:
+* Cada uno de los 9 destinos se ejecuta en un bloque `try-catch` aislado en [`BookingSyncService.syncAllBookingData()`](src/main/java/com/uade/microservices/booking/service/BookingSyncService.java).
+* **Si una ciudad falla** (por ejemplo, si falta en la tabla `ciudades` o sufre una restricción en base de datos):
+  - Ese destino específico se registra con `"estado": "ERROR"` y su mensaje de causa en la lista de resultados.
+  - El proceso **continúa de inmediato con las restantes 8 ciudades**.
+  - La respuesta HTTP devuelta es **`200 OK`** con el consolidado (`totalDestinosProcesados: 9`, `destinosExitosos: X`, `destinosConError: Y`, y el desglose ciudad por ciudad).
+
+---
+
+## 7. Pruebas Automatizadas
+
+Para compilar y correr las 19 pruebas del microservicio:
 ```bash
-./mvnw test
+./mvnw clean test
 ```
 
