@@ -85,11 +85,12 @@ public class BookingHotelRawDto {
 
     /**
      * Resuelve las estrellas buscando en las diferentes claves devueltas por Booking.
+     * Siempre devuelve un valor entre 1 y 5 (CHECK hoteles_estrellas_check).
      */
     public Integer resolveEstrellas() {
-        if (starRating != null && starRating > 0) return starRating;
-        if (hotelClass != null && hotelClass > 0) return hotelClass;
-        if (cssClass != null && cssClass > 0) return cssClass;
+        if (starRating != null && starRating > 0) return Math.clamp(starRating, 1, 5);
+        if (hotelClass != null && hotelClass > 0) return Math.clamp(hotelClass, 1, 5);
+        if (cssClass != null && cssClass > 0) return Math.clamp(cssClass, 1, 5);
         if (reviewScore != null && reviewScore > 0) {
             int stars = (int) Math.round(reviewScore / 2.0);
             return Math.clamp(stars, 1, 5);

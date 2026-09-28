@@ -66,7 +66,7 @@ class BookingSyncServiceTest {
         transformedHotel.setImagenPrincipalUrl("https://pic.jpg");
 
         HabitacionHotel hab = new HabitacionHotel();
-        hab.setTipo("Estándar");
+        hab.setTipo("Single");
         hab.setPrecioPorNocheUsd(BigDecimal.valueOf(150.00));
         hab.setStockDisponible(10);
         transformedHotel.addHabitacion(hab);
@@ -116,7 +116,7 @@ class BookingSyncServiceTest {
 
         HabitacionHotel existingHab = new HabitacionHotel();
         existingHab.setIdHabitacion(UUID.randomUUID());
-        existingHab.setTipo("Estándar");
+        existingHab.setTipo("Single");
         existingHab.setPrecioPorNocheUsd(BigDecimal.valueOf(120.00));
         existingHab.setStockDisponible(2);
         existingHotel.addHabitacion(existingHab);

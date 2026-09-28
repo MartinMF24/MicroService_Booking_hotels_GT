@@ -56,7 +56,7 @@ class BookingSyncControllerTest {
 
         HabitacionSyncSummaryDto hab = new HabitacionSyncSummaryDto(
                 UUID.randomUUID(),
-                "Estándar",
+                "Single",
                 BigDecimal.valueOf(150.00),
                 10
         );
@@ -104,7 +104,7 @@ class BookingSyncControllerTest {
                 .andExpect(jsonPath("$.data.destId").value("-671824"))
                 .andExpect(jsonPath("$.data.hotelesCreados").value(1))
                 .andExpect(jsonPath("$.data.hotelesSincronizados[0].nombre").value("Palácio Tangará"))
-                .andExpect(jsonPath("$.data.hotelesSincronizados[0].habitaciones[0].tipo").value("Estándar"));
+                .andExpect(jsonPath("$.data.hotelesSincronizados[0].habitaciones[0].tipo").value("Single"));
 
         verify(bookingSyncService, times(1)).syncBookingData(target);
     }

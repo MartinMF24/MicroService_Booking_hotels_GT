@@ -22,6 +22,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class BookingAdapter {
 
+    // Valores permitidos por habitaciones_hotel_tipo_check: ('Single', 'Doble', 'Suite')
+    public static final String TIPO_SINGLE = "Single";
+    public static final String TIPO_DOBLE = "Doble";
+    public static final String TIPO_SUITE = "Suite";
+
     private final Random random = new Random();
 
     /**
@@ -126,34 +131,35 @@ public class BookingAdapter {
     }
 
     /**
-     * Genera las habitaciones estructuradas (Estándar, Deluxe, Suite) con precios y stock acordes.
+     * Genera las habitaciones estructuradas (Single, Doble, Suite) con precios y stock acordes.
+     * Los valores de 'tipo' deben coincidir con el CHECK habitaciones_hotel_tipo_check de la BD.
      */
     private List<HabitacionHotel> buildHabitacionesForHotel(Hotel hotel, BookingHotelRawDto rawDto) {
         List<HabitacionHotel> habitaciones = new ArrayList<>();
         BigDecimal precioBase = rawDto.resolvePrecioBase().setScale(2, RoundingMode.HALF_UP);
 
-        // 1. Habitación Estándar
-        HabitacionHotel estandar = new HabitacionHotel();
-        estandar.setTipo("Estándar");
-        estandar.setPrecioPorNocheUsd(precioBase);
-        estandar.setStockDisponible(8 + (Math.abs(hotel.getNombre().hashCode()) % 8));
-        estandar.setCreatedAt(OffsetDateTime.now());
-        habitaciones.add(estandar);
+        // 1. Habitación Single
+        HabitacionHotel single = new HabitacionHotel();
+        single.setTipo(TIPO_SINGLE);
+        single.setPrecioPorNocheUsd(precioBase);
+        single.setStockDisponible(8 + (Math.abs(hotel.getNombre().hashCode()) % 8));
+        single.setCreatedAt(OffsetDateTime.now());
+        habitaciones.add(single);
 
-        // 2. Habitación Deluxe (un 35% más cara)
-        BigDecimal precioDeluxe = precioBase.multiply(BigDecimal.valueOf(1.35)).setScale(2, RoundingMode.HALF_UP);
-        HabitacionHotel deluxe = new HabitacionHotel();
-        deluxe.setTipo("Deluxe");
-        deluxe.setPrecioPorNocheUsd(precioDeluxe);
-        deluxe.setStockDisponible(3 + (Math.abs(hotel.getNombre().hashCode()) % 6));
-        deluxe.setCreatedAt(OffsetDateTime.now());
-        habitaciones.add(deluxe);
+        // 2. Habitación Doble (un 35% más cara)
+        BigDecimal precioDoble = precioBase.multiply(BigDecimal.valueOf(1.35)).setScale(2, RoundingMode.HALF_UP);
+        HabitacionHotel doble = new HabitacionHotel();
+        doble.setTipo(TIPO_DOBLE);
+        doble.setPrecioPorNocheUsd(precioDoble);
+        doble.setStockDisponible(3 + (Math.abs(hotel.getNombre().hashCode()) % 6));
+        doble.setCreatedAt(OffsetDateTime.now());
+        habitaciones.add(doble);
 
-        // 3. Suite Ejecutiva (un 80% más cara) para hoteles de 4 o 5 estrellas
+        // 3. Suite (un 80% más cara) para hoteles de 4 o 5 estrellas
         if (hotel.getEstrellas() != null && hotel.getEstrellas() >= 4) {
             BigDecimal precioSuite = precioBase.multiply(BigDecimal.valueOf(1.80)).setScale(2, RoundingMode.HALF_UP);
             HabitacionHotel suite = new HabitacionHotel();
-            suite.setTipo("Suite Ejecutiva");
+            suite.setTipo(TIPO_SUITE);
             suite.setPrecioPorNocheUsd(precioSuite);
             suite.setStockDisponible(1 + (Math.abs(hotel.getNombre().hashCode()) % 3));
             suite.setCreatedAt(OffsetDateTime.now());

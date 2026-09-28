@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS public.hoteles (
   ofrece_traslado boolean NULL DEFAULT false,
   imagen_principal_url text NULL,
   created_at timestamp with time zone NULL DEFAULT timezone ('utc'::text, now()),
-  CONSTRAINT hoteles_pkey PRIMARY KEY (id_hotel)
+  CONSTRAINT hoteles_pkey PRIMARY KEY (id_hotel),
+  CONSTRAINT hoteles_id_ciudad_fkey FOREIGN KEY (id_ciudad) REFERENCES public.ciudades (id_ciudad) ON DELETE RESTRICT,
+  CONSTRAINT hoteles_estrellas_check CHECK (estrellas >= 1 AND estrellas <= 5)
 );
 
 -- Índice para búsquedas rápidas por ciudad
@@ -34,7 +36,8 @@ CREATE TABLE IF NOT EXISTS public.habitaciones_hotel (
   stock_disponible integer NOT NULL DEFAULT 0,
   created_at timestamp with time zone NULL DEFAULT timezone ('utc'::text, now()),
   CONSTRAINT habitaciones_hotel_pkey PRIMARY KEY (id_habitacion),
-  CONSTRAINT habitaciones_hotel_id_hotel_fkey FOREIGN KEY (id_hotel) REFERENCES public.hoteles (id_hotel) ON DELETE CASCADE
+  CONSTRAINT habitaciones_hotel_id_hotel_fkey FOREIGN KEY (id_hotel) REFERENCES public.hoteles (id_hotel) ON DELETE CASCADE,
+  CONSTRAINT habitaciones_hotel_tipo_check CHECK (tipo IN ('Single', 'Doble', 'Suite'))
 );
 
 -- Índice de Foreign Key para agilizar el JOIN FETCH y borrado en cascada

@@ -50,14 +50,14 @@ class BookingAdapterTest {
         assertFalse(habitaciones.isEmpty());
         assertEquals(3, habitaciones.size());
 
-        HabitacionHotel estandar = habitaciones.stream()
-                .filter(h -> "Estándar".equalsIgnoreCase(h.getTipo()))
+        HabitacionHotel single = habitaciones.stream()
+                .filter(h -> "Single".equalsIgnoreCase(h.getTipo()))
                 .findFirst()
                 .orElse(null);
-        assertNotNull(estandar);
-        assertEquals(BigDecimal.valueOf(350.0).setScale(2), estandar.getPrecioPorNocheUsd());
-        assertTrue(estandar.getStockDisponible() > 0);
-        assertEquals(hotel, estandar.getHotel());
+        assertNotNull(single);
+        assertEquals(BigDecimal.valueOf(350.0).setScale(2), single.getPrecioPorNocheUsd());
+        assertTrue(single.getStockDisponible() > 0);
+        assertEquals(hotel, single.getHotel());
     }
 
     @Test
@@ -87,6 +87,27 @@ class BookingAdapterTest {
         assertEquals(2, hotels.size());
         assertEquals("Hotel 1", hotels.get(0).getNombre());
         assertEquals("Hotel 2", hotels.get(1).getNombre());
+    }
+
+    @Test
+    @DisplayName("Debe generar solo tipos de habitación permitidos por habitaciones_hotel_tipo_check")
+    void shouldOnlyUseRoomTypesAllowedByDatabase() {
+        List<String> tiposPermitidos = List.of("Single", "Doble", "Suite");
+
+        Hotel hotel5 = adapter.toEntity(new BookingHotelRawDto(1L, "Hotel 5", 5, 200.0, null), GranPremioTarget.MADRID);
+        Hotel hotel3 = adapter.toEntity(new BookingHotelRawDto(2L, "Hotel 3", 3, 90.0, null), GranPremioTarget.MADRID);
+
+        assertEquals(List.of("Single", "Doble", "Suite"), hotel5.getHabitaciones().stream().map(HabitacionHotel::getTipo).toList());
+        assertEquals(List.of("Single", "Doble"), hotel3.getHabitaciones().stream().map(HabitacionHotel::getTipo).toList());
+        hotel5.getHabitaciones().forEach(h -> assertTrue(tiposPermitidos.contains(h.getTipo())));
+    }
+
+    @Test
+    @DisplayName("Debe acotar las estrellas al rango 1-5 de hoteles_estrellas_check")
+    void shouldClampStarsToDatabaseRange() {
+        Hotel hotel = adapter.toEntity(new BookingHotelRawDto(1L, "Hotel 7", 7, 200.0, null), GranPremioTarget.MADRID);
+
+        assertEquals(5, hotel.getEstrellas());
     }
 }
 
