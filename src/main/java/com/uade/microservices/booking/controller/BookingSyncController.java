@@ -94,7 +94,7 @@ public class BookingSyncController {
 
     /**
      * Endpoint informativo auxiliar para listar todos los destinos disponibles en el catálogo
-     * con sus fechas principales de carrera, check-in (-2 días) y check-out (+1 día).
+     * con sus fechas principales de carrera, check-in (-1 día) y check-out (+3 días).
      */
     @GetMapping("/targets")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> listAvailableTargets() {
