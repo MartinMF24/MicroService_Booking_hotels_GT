@@ -51,19 +51,29 @@ src/main/java/com/uade/microservices/booking/
 
 ## 2. El Catálogo de Destinos y Fechas (`GranPremioTarget`)
 
-El Enum `GranPremioTarget` centraliza el calendario oficial de eventos de 2026, los identificadores requeridos por Booking (`dest_id`) y los UUIDs de enlace geográfico:
+El Enum `GranPremioTarget` centraliza el calendario oficial de eventos de 2026 y 2027, los identificadores requeridos por Booking (`dest_id`) y los UUIDs de enlace geográfico:
 
-| Enum Constant | Ciudad | Fecha Carrera | Check-in (-1 día) | Check-out (+3 días) | Booking `dest_id` |
-|---|---|:---:|:---:|:---:|:---:|
-| `MADRID` | Madrid | 2026-09-11 | 2026-09-10 | 2026-09-14 | `-391194` |
-| `BAKU` | Bakú | 2026-09-25 | 2026-09-24 | 2026-09-28 | `-2422998` |
-| `SINGAPUR` | Singapur | 2026-10-09 | 2026-10-08 | 2026-10-12 | `-114060` |
-| `AUSTIN` | Austin | 2026-10-23 | 2026-10-22 | 2026-10-26 | `20014288` |
-| `CIUDAD_DE_MEXICO` | Ciudad de México | 2026-10-30 | 2026-10-29 | 2026-11-02 | `-1658079` |
-| `SAO_PAULO` | São Paulo | 2026-11-06 | 2026-11-05 | 2026-11-09 | `-671824` |
-| `LAS_VEGAS` | Las Vegas | 2026-11-19 | 2026-11-18 | 2026-11-22 | `20079110` |
-| `LUSAIL` | Lusail | 2026-11-27 | 2026-11-26 | 2026-11-30 | `-2092875` |
-| `ABU_DABI` | Abu Dabi | 2026-12-04 | 2026-12-03 | 2026-12-07 | `-782066` |
+| Enum Constant | Ciudad | Temporada | Fecha Carrera | Check-in (-1 día) | Check-out (+3 días) | Booking `dest_id` |
+|---|---|:---:|:---:|:---:|:---:|:---:|
+| `MADRID` | Madrid | 2026 | 2026-09-11 | 2026-09-10 | 2026-09-14 | `-391194` |
+| `BAKU` | Bakú | 2026 | 2026-09-25 | 2026-09-24 | 2026-09-28 | `-2422998` |
+| `SINGAPUR` | Singapur | 2026 | 2026-10-09 | 2026-10-08 | 2026-10-12 | `-114060` |
+| `AUSTIN` | Austin | 2026 | 2026-10-23 | 2026-10-22 | 2026-10-26 | `20014288` |
+| `CIUDAD_DE_MEXICO` | Ciudad de México | 2026 | 2026-10-30 | 2026-10-29 | 2026-11-02 | `-1658079` |
+| `SAO_PAULO` | São Paulo | 2026 | 2026-11-06 | 2026-11-05 | 2026-11-09 | `-671824` |
+| `LAS_VEGAS` | Las Vegas | 2026 | 2026-11-19 | 2026-11-18 | 2026-11-22 | `20079110` |
+| `LUSAIL` | Lusail | 2026 | 2026-11-27 | 2026-11-26 | 2026-11-30 | `-2092875` |
+| `ABU_DABI` | Abu Dabi | 2026 | 2026-12-04 | 2026-12-03 | 2026-12-07 | `-782066` |
+| `SAKHIR` | Sakhir | 2027 | 2027-03-12 | 2027-03-11 | 2027-03-15 | `-784871` |
+| `YEDA` | Yeda | 2027 | 2027-03-19 | 2027-03-18 | 2027-03-22 | `-3096108` |
+| `MELBOURNE` | Melbourne | 2027 | 2027-04-02 | 2027-04-01 | 2027-04-05 | `-1586844` |
+| `SUZUKA` | Suzuka | 2027 | 2027-04-09 | 2027-04-08 | 2027-04-12 | `-244616` |
+| `SHANGHAI` | Shanghái | 2027 | 2027-04-16 | 2027-04-15 | 2027-04-19 | `-1924465` |
+| `MIAMI` | Miami | 2027 | 2027-04-30 | 2027-04-29 | 2027-05-03 | `20023181` |
+| `MONTREAL` | Montreal | 2027 | 2027-05-21 | 2027-05-20 | 2027-05-24 | `-569541` |
+| `MONTECARLO` | Montecarlo | 2027 | 2027-06-04 | 2027-06-03 | 2027-06-07 | `-1451964` |
+| `PORTIMAO` | Portimão | 2027 | 2027-06-18 | 2027-06-17 | 2027-06-21 | `-2173080` |
+| `SILVERSTONE` | Silverstone | 2027 | 2027-07-02 | 2027-07-01 | 2027-07-05 | `-2607823` |
 
 ---
 
@@ -111,7 +121,7 @@ rapidapi.booking.endpoint=${RAPIDAPI_BOOKING_ENDPOINT:/api/v1/hotels/searchHotel
 ### 1. Sincronización Masiva de Todos los Destinos (Recomendado)
 - **Método**: `POST`
 - **URL**: `http://localhost:8081/api/microservicios/sync-booking/all` *(o `/sync-all`)*
-- **Descripción**: Ejecuta el pipeline ETL para los 9 Grandes Premios de 2026 de forma secuencial y resiliente, calculando las fechas de fin de semana (check-in -1 día, check-out +3 días) y resolviendo el `id_ciudad` en la base de datos Supabase.
+- **Descripción**: Ejecuta el pipeline ETL para los 19 Grandes Premios de 2026 y 2027 de forma secuencial y resiliente, calculando las fechas de estancia (check-in -1 día, check-out +3 días) y resolviendo el `id_ciudad` en la base de datos Supabase.
 - **Ejemplo**:
 ```bash
 curl -X POST http://localhost:8081/api/microservicios/sync-booking/all

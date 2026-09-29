@@ -123,14 +123,14 @@ class BookingSyncControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/microservicios/sync-booking/targets debe retornar el catálogo completo de 9 destinos")
+    @DisplayName("GET /api/microservicios/sync-booking/targets debe retornar el catálogo completo de 19 destinos")
     void testListAvailableTargets() throws Exception {
         mockMvc.perform(get("/api/microservicios/sync-booking/targets")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data.length()").value(9))
+                .andExpect(jsonPath("$.data.length()").value(19))
                 .andExpect(jsonPath("$.data[0].target").value("MADRID"))
                 .andExpect(jsonPath("$.data[0].checkinDate").value("2026-09-10"))
                 .andExpect(jsonPath("$.data[0].checkoutDate").value("2026-09-14"));
@@ -140,7 +140,7 @@ class BookingSyncControllerTest {
     @DisplayName("POST /api/microservicios/sync-booking/all debe sincronizar todos los destinos y retornar consolidado")
     void testSyncAllBookingData() throws Exception {
         BookingSyncAllSummaryDto mockSummary = new BookingSyncAllSummaryDto(
-                9, 9, 0, 27, 20, 7, 50, 10, OffsetDateTime.now(), List.of()
+                19, 19, 0, 57, 40, 17, 100, 20, OffsetDateTime.now(), List.of()
         );
 
         when(bookingSyncService.syncAllBookingData()).thenReturn(mockSummary);
@@ -149,9 +149,9 @@ class BookingSyncControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.totalDestinosProcesados").value(9))
-                .andExpect(jsonPath("$.data.destinosExitosos").value(9))
-                .andExpect(jsonPath("$.data.totalHotelesCreados").value(20));
+                .andExpect(jsonPath("$.data.totalDestinosProcesados").value(19))
+                .andExpect(jsonPath("$.data.destinosExitosos").value(19))
+                .andExpect(jsonPath("$.data.totalHotelesCreados").value(40));
 
         verify(bookingSyncService, times(1)).syncAllBookingData();
     }

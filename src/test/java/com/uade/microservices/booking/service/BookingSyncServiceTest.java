@@ -146,7 +146,7 @@ class BookingSyncServiceTest {
     }
 
     @Test
-    @DisplayName("MASIVO: Debe procesar los 9 destinos de F1 consolidando resultados")
+    @DisplayName("MASIVO: Debe procesar los 19 destinos de F1 consolidando resultados")
     void shouldSyncAllTargetsConsolidatedSummary() {
         when(ciudadRepository.findFirstByNombreIgnoreCase(any()))
                 .thenReturn(Optional.of(new Ciudad(UUID.randomUUID(), "Ciudad Test")));
@@ -166,11 +166,11 @@ class BookingSyncServiceTest {
         BookingSyncAllSummaryDto summary = bookingSyncService.syncAllBookingData();
 
         assertNotNull(summary);
-        assertEquals(9, summary.totalDestinosProcesados());
-        assertEquals(9, summary.destinosExitosos());
+        assertEquals(19, summary.totalDestinosProcesados());
+        assertEquals(19, summary.destinosExitosos());
         assertEquals(0, summary.destinosConError());
-        assertEquals(9, summary.totalHotelesCreados());
-        assertEquals(9, summary.resultados().size());
+        assertEquals(19, summary.totalHotelesCreados());
+        assertEquals(19, summary.resultados().size());
     }
 }
 

@@ -54,7 +54,7 @@ class BookingClientServiceTest {
     }
 
     @Test
-    @DisplayName("Debe generar datos simulados específicos para cada uno de los 9 destinos de F1")
+    @DisplayName("Debe generar datos simulados específicos para cada uno de los 19 destinos de F1")
     void shouldGenerateSimulatedHotelsForAllTargets() {
         for (GranPremioTarget target : GranPremioTarget.values()) {
             List<BookingHotelRawDto> simulated = clientService.generateSimulatedHotels(target);
@@ -66,6 +66,10 @@ class BookingClientServiceTest {
                 assertNotNull(dto.getMinTotalPrice());
             }
         }
+
+        // Validar destino 2027 específico
+        List<BookingHotelRawDto> sakhirHotels = clientService.generateSimulatedHotels(GranPremioTarget.SAKHIR);
+        assertTrue(sakhirHotels.stream().anyMatch(h -> h.getHotelName().contains("Bahrain") || h.getHotelName().contains("Sofitel")));
     }
 }
 

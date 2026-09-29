@@ -51,7 +51,7 @@ public class BookingSyncService {
     }
 
     /**
-     * Ejecuta el proceso ETL para todos los destinos de Gran Premio disponibles en el catálogo 2026.
+     * Ejecuta el proceso ETL para todos los destinos de Gran Premio disponibles en el catálogo (temporadas 2026 y 2027).
      * Sincroniza cada ciudad con sus fechas correspondientes (-1 día check-in, +3 días check-out)
      * e integra un manejo de excepciones individual para que un fallo no cancele a las demás ciudades.
      *
@@ -328,6 +328,16 @@ public class BookingSyncService {
             case LAS_VEGAS -> List.of("Las Vegas");
             case LUSAIL -> List.of("Lusail", "Doha");
             case ABU_DABI -> List.of("Abu Dhabi", "Abu Dabi");
+            case SAKHIR -> List.of("Sakhir", "Bahrain", "Bahréin", "Manama");
+            case YEDA -> List.of("Yeda", "Jeddah", "Yeddah");
+            case MELBOURNE -> List.of("Melbourne");
+            case SUZUKA -> List.of("Suzuka");
+            case SHANGHAI -> List.of("Shanghái", "Shanghai");
+            case MIAMI -> List.of("Miami");
+            case MONTREAL -> List.of("Montreal", "Montréal");
+            case MONTECARLO -> List.of("Montecarlo", "Monte Carlo", "Monaco", "Mónaco");
+            case PORTIMAO -> List.of("Portimão", "Portimao");
+            case SILVERSTONE -> List.of("Silverstone");
         };
     }
 }

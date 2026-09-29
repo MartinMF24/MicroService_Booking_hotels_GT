@@ -110,6 +110,16 @@ public class BookingAdapter {
                 // Fallback a simulación
             }
         }
+        if (rawDto.getDistanceToCc() != null) {
+            try {
+                double parsed = Double.parseDouble(rawDto.getDistanceToCc().replaceAll("[^0-9.]", ""));
+                if (parsed > 0 && parsed < 500) {
+                    return BigDecimal.valueOf(parsed).setScale(2, RoundingMode.HALF_UP);
+                }
+            } catch (Exception ignored) {
+                // Fallback a simulación
+            }
+        }
 
         double baseKm = switch (target) {
             case MADRID -> 14.50;
@@ -121,6 +131,17 @@ public class BookingAdapter {
             case LAS_VEGAS -> 3.10;
             case LUSAIL -> 22.00;
             case ABU_DABI -> 4.20;
+            case SAKHIR -> 5.50;
+            case YEDA -> 3.80;
+            case MELBOURNE -> 4.50;
+            case SUZUKA -> 2.00;
+            case SHANGHAI -> 28.00;
+            case MIAMI -> 12.00;
+            case MONTREAL -> 6.50;
+            case MONTECARLO -> 0.80;
+            case PORTIMAO -> 15.00;
+            case SILVERSTONE -> 1.50;
+            case null, default -> 10.00;
         };
 
         int hash = Math.abs(rawDto.resolveNombre().hashCode() % 50);

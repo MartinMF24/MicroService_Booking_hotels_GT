@@ -104,10 +104,15 @@ public class BookingClientService {
         return UriComponentsBuilder.fromUriString(fullUrl)
                 .queryParam("dest_id", destId)
                 .queryParam("dest_type", destType != null ? destType : "city")
+                .queryParam("search_type", destType != null ? destType : "city")
+                .queryParam("arrival_date", checkinDate.toString())
+                .queryParam("departure_date", checkoutDate.toString())
                 .queryParam("checkin_date", checkinDate.toString())
                 .queryParam("checkout_date", checkoutDate.toString())
                 .queryParam("adults_number", "2")
+                .queryParam("adults", "2")
                 .queryParam("room_number", "1")
+                .queryParam("room_qty", "1")
                 .queryParam("units", "metric")
                 .queryParam("order_by", "popularity")
                 .queryParam("locale", "es")
@@ -214,6 +219,56 @@ public class BookingClientService {
                 list.add(new BookingHotelRawDto(90901L, "W Abu Dhabi - Yas Island Trackside", 5, 580.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
                 list.add(new BookingHotelRawDto(90902L, "The Yas Hotel Marina Views", 5, 420.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
                 list.add(new BookingHotelRawDto(90903L, "Radisson Blu Hotel Yas Island", 4, 210.0, "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"));
+            }
+            case SAKHIR -> {
+                list.add(new BookingHotelRawDto(110101L, "Sofitel Bahrain Zallaq Thalassa Sea & Spa", 5, 320.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(110102L, "The Ritz-Carlton Bahrain", 5, 450.0, "https://images.unsplash.com/photo-1571896349842-33c89424de2d"));
+                list.add(new BookingHotelRawDto(110103L, "Four Seasons Hotel Bahrain Bay", 5, 380.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
+            }
+            case YEDA -> {
+                list.add(new BookingHotelRawDto(120101L, "Shangri-La Jeddah Corniche", 5, 410.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(120102L, "The Ritz-Carlton Jeddah", 5, 360.0, "https://images.unsplash.com/photo-1571896349842-33c89424de2d"));
+                list.add(new BookingHotelRawDto(120103L, "Rosewood Jeddah Trackside", 5, 290.0, "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"));
+            }
+            case MELBOURNE -> {
+                list.add(new BookingHotelRawDto(130101L, "Crown Towers Melbourne Albert Park", 5, 340.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(130102L, "The Langham Melbourne", 5, 280.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
+                list.add(new BookingHotelRawDto(130103L, "Grand Hyatt Melbourne", 5, 220.0, "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"));
+            }
+            case SUZUKA -> {
+                list.add(new BookingHotelRawDto(140101L, "Suzuka Circuit Hotel", 4, 195.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(140102L, "Comfort Hotel Suzuka", 3, 95.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
+                list.add(new BookingHotelRawDto(140103L, "Miyako Hotel Yokkaichi Trackside", 4, 140.0, "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"));
+            }
+            case SHANGHAI -> {
+                list.add(new BookingHotelRawDto(150101L, "The Peninsula Shanghai", 5, 390.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(150102L, "Pudong Shangri-La Shanghai", 5, 270.0, "https://images.unsplash.com/photo-1571896349842-33c89424de2d"));
+                list.add(new BookingHotelRawDto(150103L, "Grand Kempinski Hotel Shanghai", 5, 210.0, "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"));
+            }
+            case MIAMI -> {
+                list.add(new BookingHotelRawDto(160101L, "Seminole Hard Rock Hotel & Stadium Miami", 5, 460.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(160102L, "1 Hotel South Beach Miami", 5, 510.0, "https://images.unsplash.com/photo-1571896349842-33c89424de2d"));
+                list.add(new BookingHotelRawDto(160103L, "Four Seasons Hotel Miami", 5, 430.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
+            }
+            case MONTREAL -> {
+                list.add(new BookingHotelRawDto(170101L, "Four Seasons Hotel Montreal", 5, 380.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(170102L, "Fairmont The Queen Elizabeth Montreal", 5, 260.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
+                list.add(new BookingHotelRawDto(170103L, "Hotel William Gray Old Montreal", 4, 210.0, "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"));
+            }
+            case MONTECARLO -> {
+                list.add(new BookingHotelRawDto(180101L, "Hotel de Paris Monte-Carlo Casino", 5, 950.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(180102L, "Fairmont Monte Carlo Trackside Hairpin", 4, 620.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
+                list.add(new BookingHotelRawDto(180103L, "Hotel Hermitage Monte-Carlo", 5, 780.0, "https://images.unsplash.com/photo-1571896349842-33c89424de2d"));
+            }
+            case PORTIMAO -> {
+                list.add(new BookingHotelRawDto(190101L, "Algarve Casino Hotel Portimão", 5, 240.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(190102L, "Bela Vista Hotel & Spa Portimão", 5, 310.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
+                list.add(new BookingHotelRawDto(190103L, "Tivoli Marina Portimão Algarve", 4, 160.0, "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"));
+            }
+            case SILVERSTONE -> {
+                list.add(new BookingHotelRawDto(200101L, "Hilton Garden Inn Silverstone Trackside", 4, 310.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));
+                list.add(new BookingHotelRawDto(200102L, "Whittlebury Hall Hotel & Spa Silverstone", 4, 220.0, "https://images.unsplash.com/photo-1582719508461-905c673771fd"));
+                list.add(new BookingHotelRawDto(200103L, "Silverstone Golf Club & Country Hotel", 4, 175.0, "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"));
             }
             default -> {
                 list.add(new BookingHotelRawDto(99901L, "Grand Prix Premium Hotel " + ciudad, 4, 180.0, "https://images.unsplash.com/photo-1566073771259-6a8506099945"));

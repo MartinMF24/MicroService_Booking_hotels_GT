@@ -37,7 +37,7 @@ public class BookingSyncController {
 
     /**
      * Endpoint para ejecutar la sincronización ETL masiva de hoteles de Booking
-     * para TODOS los 9 destinos de Gran Premio de Fórmula 1 para 2026.
+     * para TODOS los destinos de Gran Premio de Fórmula 1 configurados en el catálogo.
      * Carga cada ciudad en sus fechas correspondientes (-1 día check-in, +3 días check-out).
      *
      * @return ApiResponse con el consolidado general y la lista detallada por destino.

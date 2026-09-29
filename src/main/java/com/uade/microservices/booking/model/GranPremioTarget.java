@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Catálogo de destinos de Gran Premio de Fórmula 1 y fechas de carrera para 2026.
+ * Catálogo de destinos de Gran Premio de Fórmula 1 y fechas de carrera para las temporadas 2026 y 2027.
  * Incluye metadatos necesarios para el proceso ETL de Booking (dest_id, fechas y ciudad asociada).
  */
 public enum GranPremioTarget {
@@ -73,6 +73,76 @@ public enum GranPremioTarget {
             "city",
             "Abu Dabi",
             UUID.fromString("d028fc05-78cd-4dd8-96d0-9134ff624468")
+    ),
+    SAKHIR(
+            "2027-03-12",
+            "-784871",
+            "city",
+            "Sakhir",
+            UUID.fromString("3e1f5f36-aae4-4499-a3bf-469698515167")
+    ),
+    YEDA(
+            "2027-03-19",
+            "-3096108",
+            "city",
+            "Yeda",
+            UUID.fromString("f8dcf9af-df06-4f0c-a72e-ae8100c9a7d2")
+    ),
+    MELBOURNE(
+            "2027-04-02",
+            "-1586844",
+            "city",
+            "Melbourne",
+            UUID.fromString("545e94e2-b90e-4b1d-9a65-ed9f85710b00")
+    ),
+    SUZUKA(
+            "2027-04-09",
+            "-244616",
+            "city",
+            "Suzuka",
+            UUID.fromString("afc1ef81-973a-4a82-a904-4e9fbf0688ba")
+    ),
+    SHANGHAI(
+            "2027-04-16",
+            "-1924465",
+            "city",
+            "Shanghái",
+            UUID.fromString("66215536-b554-4028-90b0-be74b485f913")
+    ),
+    MIAMI(
+            "2027-04-30",
+            "20023181",
+            "city",
+            "Miami",
+            UUID.fromString("b1044436-1e90-4ea4-aa04-a6be47db01d2")
+    ),
+    MONTREAL(
+            "2027-05-21",
+            "-569541",
+            "city",
+            "Montreal",
+            UUID.fromString("36851257-396b-48fa-9539-219a07248dc0")
+    ),
+    MONTECARLO(
+            "2027-06-04",
+            "-1451964",
+            "city",
+            "Montecarlo",
+            UUID.fromString("4feae55b-e6e4-4d97-b62c-bc55a501af51")
+    ),
+    PORTIMAO(
+            "2027-06-18",
+            "-2173080",
+            "city",
+            "Portimão",
+            UUID.fromString("05e3a519-00e1-47a3-8c56-c3e6f5a06514")
+    ),
+    SILVERSTONE(
+            "2027-07-02",
+            "-2607823",
+            "city",
+            "Silverstone",
+            UUID.fromString("909dfe29-dd7d-41ba-a580-545d1443b2b6")
     );
 
     private final LocalDate fechaCarrera;
@@ -130,9 +200,19 @@ public enum GranPremioTarget {
         if (value == null || value.isBlank()) {
             return Optional.empty();
         }
-        String normalized = value.trim().toUpperCase().replace("-", "_");
+        String normalized = java.text.Normalizer.normalize(value.trim(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toUpperCase()
+                .replace("-", "_")
+                .replace(" ", "_");
+
+        if ("MONTE_CARLO".equals(normalized)) {
+            normalized = "MONTECARLO";
+        }
+
+        final String targetName = normalized;
         return Arrays.stream(values())
-                .filter(target -> target.name().equals(normalized))
+                .filter(target -> target.name().equals(targetName))
                 .findFirst();
     }
 }
